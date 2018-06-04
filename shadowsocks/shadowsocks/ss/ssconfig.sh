@@ -423,7 +423,7 @@ start_sslocal(){
 
 start_dns(){
 	# Start ss-local
-	[ "$ss_basic_type" != "3" ] && start_sslocal
+	[ "$ss_basic_type" != "3" -a "$ss_basic_type" != "4"] && start_sslocal
 	
 	# Start cdns
 	if [ "$ss_foreign_dns" == "1" ];then
@@ -470,11 +470,13 @@ start_dns(){
 		chinadns -p $DNS_PORT -s $ss_chinadns_user -e $clinet_ip,$ss_real_server_ip -c /koolshare/ss/rules/chnroute.txt >/dev/null 2>&1 &
 	fi
 	
-	# Start DNS2SOCKS (default)
-	if [ "$ss_foreign_dns" == "3" ] || [ -z "$ss_foreign_dns" ];then
-		[ -z "$ss_foreign_dns" ] && dbus set ss_foreign_dns="3"
-		echo_date 开启dns2socks，用于dns解析...
-		dns2socks 127.0.0.1:23456 "$ss_dns2socks_user" 127.0.0.1:$DNS_PORT > /dev/null 2>&1 &
+	if [ "$ss_basic_type" != "4"]; then
+		# Start DNS2SOCKS (default)
+		if [ "$ss_foreign_dns" == "3" ] || [ -z "$ss_foreign_dns" ];then
+			[ -z "$ss_foreign_dns" ] && dbus set ss_foreign_dns="3"
+			echo_date 开启dns2socks，用于dns解析...
+			dns2socks 127.0.0.1:23456 "$ss_dns2socks_user" 127.0.0.1:$DNS_PORT > /dev/null 2>&1 &
+		fi
 	fi
 	
 	# Start ss-tunnel
@@ -489,7 +491,7 @@ start_dns(){
 			else
 				ss-tunnel -c $CONFIG_FILE -l $DNS_PORT -L $ss_sstunnel_user $ARG_OBFS -u -f /var/run/sstunnel.pid >/dev/null 2>&1
 			fi
-		elif [ "$ss_basic_type" == "3" ];then
+		elif [ "$ss_basic_type" == "3" -o "$ss_basic_type" == "4" ];then
 			echo_date V2Ray下不支持ss-tunnel，改用dns2socks！
 			dbus set ss_foreign_dns=3
 			echo_date 开启dns2socks，用于dns解析...
@@ -527,7 +529,7 @@ start_dns(){
 	
 	# start v2ray DNS_PORT
 	if [ "$ss_foreign_dns" == "7" ];then
-		if [ "$ss_basic_type" == "3" ];then
+		if [ "$ss_basic_type" == "3" -o "$ss_basic_type" == "4" ];then
 			return 0
 		else
 			echo_date $(get_type_name $ss_basic_type)下不支持v2ray dns，改用dns2socks！
@@ -833,6 +835,16 @@ start_speeder(){
 			$UD2RAW_LOW $ss_basic_udp2raw_other >/dev/null 2>&1 &
 		fi
 	fi
+}
+
+start_anyconnect() {
+	echo_date 开启anyconnect进程，用于透明代理.
+	
+	openconnect -s 127.0.0.1 -p 1091 -c $CONFIG_FILE $ARG_OBFS -f /var/run/shadowsocks.pid >/dev/null 2>&1
+
+	echo_date $BIN 启动完毕！.
+	
+	start_speeder
 }
 
 start_ss_redir(){
@@ -1872,6 +1884,7 @@ apply_ss(){
 	[ "$ss_basic_type" == "0" ] || [ "$ss_basic_type" == "1" ] && start_ss_redir
 	[ "$ss_basic_type" == "2" ] && start_koolgame
 	[ "$ss_basic_type" == "3" ] && start_v2ray
+	[ "$ss_basic_type" == "4" ] && start_anyconnect
 	[ "$ss_basic_type" != "2" ] && start_kcp
 	[ "$ss_basic_type" != "2" ] && start_dns
 	load_module

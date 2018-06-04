@@ -119,6 +119,7 @@ check_status(){
 	HAPROXY=`pidof haproxy`
 	V2RAY=`pidof v2ray`
 	HDP=`pidof https_dns_proxy`
+	ANYCONNECT = `pidof openconnect`
 	game_on=`dbus list ss_acl_mode|cut -d "=" -f 2 | grep 3`
 
 	if [ "$ss_basic_type" == "0" ];then
@@ -149,6 +150,14 @@ check_status(){
 		echo -----------------------------------------------------------
 		echo "程序		状态	PID"
 		[ -n "$V2RAY" ] && echo "v2ray		工作中	pid：$V2RAY" || echo "v2ray	未运行"
+	elif [ $ss_basic_type == "4" ];then
+		echo_version
+		echo
+		echo ② 检测当前相关进程工作状态：（你正在使用anyConnect,选择的模式是$(get_mode_name $ss_basic_mode),国外DNS解析方案是：$(get_dns_name $ss_foreign_dns)）
+		echo -----------------------------------------------------------
+		echo "程序		状态	PID"
+		[ -n "$ANYCONNECT" ] && echo "ANYCONNECT		工作中	pid：$ANYCONNECT" || echo "ANYCONNECT	未运行"
+
 	fi
 
 	if [ -z "$ss_basic_koolgame_udp" ];then

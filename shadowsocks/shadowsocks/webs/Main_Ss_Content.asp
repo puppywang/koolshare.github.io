@@ -383,6 +383,15 @@ function save(s) {
 				dbus["ss_basic_" + remove_gamev2[i]] = "";
 				dbus["ssconf_basic_" + remove_gamev2[i] + "_" + node_sel] = "";
 			}
+		} else if (typeof(db_ss["ssconf_basic_ss_username" + node_sel]) != "undefined") {
+			var remove_ssr = [ "ss_obfs", "ss_obfs_host", "rss_protocol", "rss_protocol_param", "rss_obfs", "rss_obfs_param", "koolgame_udp", "v2ray_use_json", "v2ray_uuid", "v2ray_alterid", "v2ray_security", "v2ray_network", "v2ray_headtype_tcp", "v2ray_headtype_kcp", "v2ray_network_path", "v2ray_network_host", "v2ray_network_security", "v2ray_mux_enable", "v2ray_mux_concurrency", "v2ray_json"];
+			//console.log("use aynConnect");
+			dbus["ss_basic_type"] = "4"
+			dbus["ssconf_basic_type_" + node_sel] = "4"
+			for (var i = 0; i < remove_ssr.length; i++) {
+				dbus["ss_basic_" + remove_ssr[i]] = "";
+				dbus["ssconf_basic_" + remove_ssr[i] + "_" + node_sel] = "";
+			}
 		} else {
 			if (typeof(db_ss["ssconf_basic_v2ray_use_json_" + node_sel]) != "undefined"){
 				var remove_v2ray = [ "ss_obfs", "ss_obfs_host", "koolgame_udp", "rss_protocol", "rss_protocol_param", "rss_obfs", "rss_obfs_param"];
@@ -796,7 +805,7 @@ function getAllConfigs() {
 			obj["method"] = db_ss[p + "_method_" + field];
 		}
 
-		var params = ["password", "mode", "ss_obfs", "ss_obfs_host", "koolgame_udp", "rss_protocol", "rss_protocol_param", "rss_obfs", "rss_obfs_param", "group", "weight", "lbmode", "v2ray_uuid", "v2ray_alterid", "v2ray_security", "v2ray_network", "v2ray_headtype_tcp", "v2ray_headtype_kcp", "v2ray_network_path", "v2ray_network_host", "v2ray_network_security", "v2ray_mux_concurrency", "v2ray_json", "v2ray_use_json", "v2ray_mux_enable"];
+		var params = ["password", "username", "group", "mode", "ss_obfs", "ss_obfs_host", "koolgame_udp", "rss_protocol", "rss_protocol_param", "rss_obfs", "rss_obfs_param", "group", "weight", "lbmode", "v2ray_uuid", "v2ray_alterid", "v2ray_security", "v2ray_network", "v2ray_headtype_tcp", "v2ray_headtype_kcp", "v2ray_network_path", "v2ray_network_host", "v2ray_network_security", "v2ray_mux_concurrency", "v2ray_json", "v2ray_use_json", "v2ray_mux_enable"];
 		for (var i = 0; i < params.length; i++) {
 			var ofield = p + "_" + params[i] + "_" + field;
 			if (typeof db_ss["ssconf_basic_mode_" + field] == "undefined") {
@@ -955,6 +964,7 @@ function tabclickhandler(_type) {
 	E('ssrTitle').className = "vpnClientTitle_td_unclick";
 	E('gamev2Title').className = "vpnClientTitle_td_unclick";
 	E('v2rayTitle').className = "vpnClientTitle_td_unclick";
+	E('anyConnectTitle').className = "vpnClientTitle_td_unclick";
 	if (_type == 0) {
 		save_flag = "shadowsocks";
 		E("vpnc_type").value = "shadowsocks";
@@ -965,6 +975,8 @@ function tabclickhandler(_type) {
 		E('ss_port_support_tr').style.display = "";
 		E('ss_passwd_support_tr').style.display = "";
 		E('ss_method_support_tr').style.display = "";
+		E('ss_username_support_tr').style.display = "none";
+		E('ss_group_support_tr').style.display = "none";
 		E('ssr_protocol_tr').style.display = "none";
 		E('ssr_protocol_param_tr').style.display = "none";
 		E('ssr_obfs_tr').style.display = "none";
@@ -994,6 +1006,8 @@ function tabclickhandler(_type) {
 		E('ss_port_support_tr').style.display = "";
 		E('ss_passwd_support_tr').style.display = "";
 		E('ss_method_support_tr').style.display = "";
+		E('ss_username_support_tr').style.display = "none";
+		E('ss_group_support_tr').style.display = "none";
 		E('ss_obfs_support').style.display = "none";
 		E('ss_obfs_host_support').style.display = "none";
 		E('ssr_protocol_tr').style.display = "";
@@ -1023,6 +1037,8 @@ function tabclickhandler(_type) {
 		E('ss_port_support_tr').style.display = "";
 		E('ss_passwd_support_tr').style.display = "";
 		E('ss_method_support_tr').style.display = "";
+		E('ss_username_support_tr').style.display = "none";
+		E('ss_group_support_tr').style.display = "none";
 		E('ss_obfs_support').style.display = "none";
 		E('ss_obfs_host_support').style.display = "none";
 		E('ssr_protocol_tr').style.display = "none";
@@ -1050,6 +1066,8 @@ function tabclickhandler(_type) {
 		E('ss_name_support_tr').style.display = "";
 		E('ss_passwd_support_tr').style.display = "none";
 		E('ss_method_support_tr').style.display = "none";
+		E('ss_username_support_tr').style.display = "none";
+		E('ss_group_support_tr').style.display = "none";
 		E('ss_obfs_support').style.display = "none";
 		E('ss_obfs_host_support').style.display = "none";
 		E('ssr_protocol_tr').style.display = "none";
@@ -1109,7 +1127,38 @@ function tabclickhandler(_type) {
 			showhide("v2ray_mux_concurrency_tr", (E("ss_node_table_v2ray_mux_enable").checked));
 			showhide("v2ray_json_tr", (E("ss_node_table_v2ray_use_json").checked));
 		}
-	} 
+	} else if (_type == 4) {
+		save_flag = "anyConnect";
+		E("vpnc_type").value = "anyConnect";
+		E('anyConnectTitle').className = "vpnClientTitle_td_click";
+		E('v2ray_use_json_tr').style.display = "none";
+		E('ss_name_support_tr').style.display = "";
+		E('ss_server_support_tr').style.display = "";
+		E('ss_port_support_tr').style.display = "";
+		E('ss_passwd_support_tr').style.display = "";
+		E('ss_method_support_tr').style.display = "none";
+		E('ss_username_support_tr').style.display = "";
+		E('ss_group_support_tr').style.display = "";
+		E('ss_obfs_support').style.display = "none";
+		E('ss_obfs_host_support').style.display = "none";
+		E('ssr_protocol_tr').style.display = "none";
+		E('ssr_protocol_param_tr').style.display = "none";
+		E('ssr_obfs_tr').style.display = "none";
+		E('ssr_obfs_param_tr').style.display = "none";
+		E('gameV2_udp_tr').style.display = "none";
+		E('v2ray_uuid_tr').style.display = "none";
+		E('v2ray_alterid_tr').style.display = "none";
+		E('v2ray_security_tr').style.display = "none";
+		E('v2ray_network_tr').style.display = "none";
+		E('v2ray_headtype_tcp_tr').style.display = "none";
+		E('v2ray_headtype_kcp_tr').style.display = "none";
+		E('v2ray_network_path_tr').style.display = "none";
+		E('v2ray_network_host_tr').style.display = "none";
+		E('v2ray_network_security_tr').style.display = "none";
+		E('v2ray_mux_enable_tr').style.display = "none";
+		E('v2ray_mux_concurrency_tr').style.display = "none";
+		E('v2ray_json_tr').style.display = "none";
+	}
 	return save_flag;
 }
 
@@ -1122,6 +1171,7 @@ function add_ss_node_conf(flag) { //点击添加按钮动作
 	var params3 = ["mode", "name", "server", "port", "method", "koolgame_udp"]; //for ssr
 	var params4_1 = ["mode", "name", "server", "port", "v2ray_uuid", "v2ray_alterid", "v2ray_security", "v2ray_network", "v2ray_headtype_tcp", "v2ray_headtype_kcp", "v2ray_network_path", "v2ray_network_host", "v2ray_network_security", "v2ray_mux_concurrency"]; //for v2ray
 	var params4_2 = ["v2ray_use_json", "v2ray_mux_enable"]; //for v2ray
+	var params5 = ["mode", "name", "server", "port", "username", "group"]; //for anyconnect
 	if(!$.trim($('#ss_node_table_name').val())){
 		alert("节点名不能为空！！");
 		return false;
@@ -1144,6 +1194,12 @@ function add_ss_node_conf(flag) { //点击添加按钮动作
 		}
 		ns[p + "_password_" + node_global_max] = Base64.encode($.trim($("#ss_node_table_password").val()));
 		ns[p + "_type_" + node_global_max] = "2";
+	} else if (flag == "anyConnect") {
+		for (var i = 0; i < params5.length; i++) {
+			ns[p + "_" + params5[i] + "_" + node_global_max] = $.trim($('$ss_node_table' + '_' + param5[i]).val());
+		}
+		ns[p + "_password_" + node_global_max] = Base64.encode($.trim($("#ss_node_table_password").val()));
+		ns[p + "_type_" + node_global_max] = "0";
 	} else if (flag == 'v2ray') {
 		//normal value
 		for (var i = 0; i < params4_1.length; i++) {
@@ -1196,6 +1252,8 @@ function add_ss_node_conf(flag) { //点击添加按钮动作
 				E("ss_node_table_name").value = "";
 				E("ss_node_table_port").value = "";
 				E("ss_node_table_password").value = "";
+				E("ss_node_table_username").value = "";
+				E("ss_node_table_group").value = "";
 				E("ss_node_table_method").value = "aes-256-cfb";
 				E("ss_node_table_mode").value = "1";
 				E("ss_node_table_ss_obfs").value = "0"
@@ -2887,10 +2945,11 @@ function v2ray_binary_update (){
 													<td>		
 														<table width="100%" border="0" align="left" cellpadding="0" cellspacing="0" class="vpnClientTitle">
 															<tr>
-													  		<td width="25%" align="center" id="ssTitle" onclick="tabclickhandler(0);">添加SS账号</td>
-													  		<td width="25%" align="center" id="ssrTitle" onclick="tabclickhandler(1);">添加SSR账号</td>
-													  		<td width="25%" align="center" id="gamev2Title" onclick="tabclickhandler(2);">添加koolgame账号</td>
-													  		<td width="25%" align="center" id="v2rayTitle" onclick="tabclickhandler(3);">添加V2Ray配置</td>
+													  		<td width="20%" align="center" id="ssTitle" onclick="tabclickhandler(0);">添加SS账号</td>
+													  		<td width="20%" align="center" id="ssrTitle" onclick="tabclickhandler(1);">添加SSR账号</td>
+													  		<td width="20%" align="center" id="gamev2Title" onclick="tabclickhandler(2);">添加koolgame账号</td>
+															  <td width="20%" align="center" id="v2rayTitle" onclick="tabclickhandler(3);">添加V2Ray配置</td>
+															  <td width="20%" align="center" id="v2rayTitle" onclick="tabclickhandler(4)">添加AnyConnect配置</td>
 															</tr>
 														</table>
 													</td>
@@ -2936,6 +2995,18 @@ function v2ray_binary_update (){
 																<th>服务器端口</th>
 																<td>
 																	<input type="text" maxlength="64" id="ss_node_table_port" name="ss_node_table_port" value="" class="input_ss_table" style="width:342px;float:left;" autocomplete="off" autocorrect="off" autocapitalize="off"/>
+																</td>
+															</tr>
+															<tr id="ss_username_support_tr" style="display: none">
+																<th>用户名</th>
+																<td>
+																	<input type="text" maxlength="64" id="ss_node_table_username" name="ss_node_table_username" value="" class="input_ss_table" style="width:342px;float:left;" autocomplete="off" autocorrect="off" autocapitalize="off"/>
+																</td>
+															</tr>
+															<tr id="ss_group_support_tr" style="display: none">
+																<th>用户组</th>
+																<td>
+																	<input type="text" maxlength="64" id="ss_node_table_group" name="ss_node_table_group" value="" class="input_ss_table" style="width:342px;float:left;" autocomplete="off" autocorrect="off" autocapitalize="off"/>
 																</td>
 															</tr>
 															<tr id="ss_passwd_support_tr" style="display: none;">
